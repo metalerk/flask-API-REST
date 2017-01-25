@@ -11,9 +11,6 @@ app = Flask(__name__)
 PORT = 8080
 DEBUG = True
 API_BASE = '/api/v1/'
-@app.errorhandler(404):
-def not_found(error):
-    return jsonify(generate_response(404, error='Curso no encontrado'))
 
 @app.before_request
 def before_request():
@@ -27,7 +24,8 @@ def after_request(request):
 
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify(generate_response(404, error="Curso no encontrado"))
+    return jsonify(generate_response(404, error='Curso no encontrado'))
+
 
 @app.route(API_BASE + 'courses', methods=['GET'])
 def get_courses():
@@ -36,14 +34,14 @@ def get_courses():
     return jsonify(generate_response(data=courses))
 
 @app.route(API_BASE + 'courses/<int:course_id>', methods=['GET'])
-def try_course(course_id):
+def get_course(course_id):
     course = try_course(course_id)
     return jsonify(generate_response(data=course.to_json()))
 
-def get_course(course_id):
+def try_course(course_id):
     try:
         return Course.get(Course.id == course_id)
-    except CourseDoesNotExist as e:
+    except Course.DoesNotExist:
         abort(404)
 
 def generate_response(status=200, data=None, error=None):
