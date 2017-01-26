@@ -2,13 +2,14 @@ from flask import Flask
 from flask import g
 from flask import jsonify
 from flask import abort
+from flask import request
 
 from models import initialize
 from models import Course
 from models import DATABASE
 
 app = Flask(__name__)
-PORT = 8080
+PORT = 8000
 DEBUG = True
 API_BASE = '/api/v1/'
 
@@ -26,6 +27,13 @@ def after_request(request):
 def not_found(error):
     return jsonify(generate_response(404, error='Curso no encontrado'))
 
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify(generate_response(400, error='Bad Request'))
+
+@app.errorhandler(422)
+def unprocessable_entity(error):
+    return jsonify(generate_response(422, error="Unprocessable Entity"))
 
 @app.route(API_BASE + 'courses', methods=['GET'])
 def get_courses():
@@ -36,6 +44,18 @@ def get_courses():
 @app.route(API_BASE + 'courses/<int:course_id>', methods=['GET'])
 def get_course(course_id):
     course = try_course(course_id)
+    return jsonify(generate_response(data=course.to_json()))
+
+@app.route(API_BASE + 'courses/', methods=['POST'])
+def post_course():
+    if not request.json:
+        abort(400)
+    title = request.json.get('title', '')
+    description = request.json.get('description', '')
+
+    course = Course.new(title, description)
+    if course is None:
+        abort(422)
     return jsonify(generate_response(data=course.to_json()))
 
 def try_course(course_id):

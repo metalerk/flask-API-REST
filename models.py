@@ -1,7 +1,7 @@
 from peewee import *
 from datetime import datetime
 
-DATABASE = MySQLDatabase('flaskAPI', host="localhost", user="root", passwd="")
+DATABASE = MySQLDatabase('flaskAPI', host="localhost", user="root", passwd="root")
 
 class Course(Model):
     class Meta:
@@ -14,6 +14,14 @@ class Course(Model):
 
     def to_json(self):
         return {'id' : self.id, 'title' : self.title, 'description' : self.description}
+
+    @classmethod
+    def new(cls, title, description):
+        try:
+            return cls.create(title=title, description=description)
+        except IntegrityError:
+            print("Error de integridad")
+            return None
 
 def create_course():
     title = "Ejercicio Flask"
