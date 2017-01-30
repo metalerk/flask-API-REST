@@ -58,6 +58,29 @@ def post_course():
         abort(422)
     return jsonify(generate_response(data=course.to_json()))
 
+@app.route(API_BASE + 'courses/<int:course_id>', methods=['PUT'])
+def put_course(course_id):
+    course = try_course(course_id)
+    if not request.json:
+        abort(400)
+
+    course.title = request.json.get('title', course.title)
+    course.description = request.json.get('description', course.description)
+
+    if course.save():
+        return jsonify(generate_response(data=course.to_json(º)))
+    else:
+        abort(422)
+
+@app.route(API_BASE + 'courses/<int:course_id>', methods=['DELETE'])
+def delete_course(course_id):
+    course = try_course(course_id)
+
+    if course.delete_instance():
+        return jsonify(generate_response(data={}))
+    else:
+        abort(422)
+
 def try_course(course_id):
     try:
         return Course.get(Course.id == course_id)

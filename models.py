@@ -1,7 +1,7 @@
 from peewee import *
 from datetime import datetime
 
-DATABASE = MySQLDatabase('flaskAPI', host="localhost", user="root", passwd="root")
+DATABASE = MySQLDatabase('flaskAPI', host="localhost", user="root", passwd="")
 
 class Course(Model):
     class Meta:
